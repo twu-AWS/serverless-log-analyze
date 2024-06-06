@@ -44,6 +44,7 @@ func transform(event events.KinesisFirehoseEvent) (events.KinesisFirehoseRespons
 				result[header["name"].(string)] = header["value"].(string)
 			}
 		}
+		delete(result["httpRequest"].(map[string]any), "headers")
 		res, err := json.Marshal(result)
 		//var jsonRes = make([]byte, base64.StdEncoding.EncodedLen(len(res)))
 		if err != nil {
