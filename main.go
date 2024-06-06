@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -34,8 +36,13 @@ func transform(event events.KinesisFirehoseEvent) (events.KinesisFirehoseRespons
 			header, ok := header.(map[string]any)
 			if !ok {
 				log.Fatal(ok)
+				continue
 			}
-			result[header["name"].(string)] = header["value"].(string)
+			if slices.Contains(exclude_headers, strings.ToLower(header["name"].(string))) {
+				continue
+			} else {
+				result[header["name"].(string)] = header["value"].(string)
+			}
 		}
 		res, err := json.Marshal(result)
 		//var jsonRes = make([]byte, base64.StdEncoding.EncodedLen(len(res)))
@@ -53,6 +60,8 @@ func transform(event events.KinesisFirehoseEvent) (events.KinesisFirehoseRespons
 	}
 	return response, nil
 }
+
+var exclude_headers = []string{"access_token", "cookie", "t_token"}
 
 func main() {
 	// Make the handler available for Remote Procedure Call by AWS Lambda
