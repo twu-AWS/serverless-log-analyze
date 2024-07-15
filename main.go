@@ -38,10 +38,10 @@ func transform(event events.KinesisFirehoseEvent) (events.KinesisFirehoseRespons
 				log.Fatal(ok)
 				continue
 			}
-			if slices.Contains(exclude_headers, strings.ToLower(header["name"].(string))) {
-				continue
-			} else {
+			if slices.Contains(include_headers, strings.ToLower(header["name"].(string))) {
 				result[header["name"].(string)] = header["value"].(string)
+			} else {
+				continue
 			}
 		}
 		delete(result["httpRequest"].(map[string]any), "headers")
@@ -62,7 +62,29 @@ func transform(event events.KinesisFirehoseEvent) (events.KinesisFirehoseRespons
 	return response, nil
 }
 
-var exclude_headers = []string{"access_token", "cookie", "t_token"}
+var include_headers = []string{"host",
+	"content-length",
+	"app-group",
+	"ch",
+	"device-type",
+	"did",
+	"os",
+	"reqid",
+	"hl",
+	"osv",
+	"user-agent",
+	"x-sv",
+	"content-type",
+	"x-s",
+	"appid",
+	"platform",
+	"app",
+	"ver",
+	"odid",
+	"accept",
+	"origin",
+	"referer",
+	"ph"}
 
 func main() {
 	// Make the handler available for Remote Procedure Call by AWS Lambda
